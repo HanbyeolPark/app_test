@@ -123,7 +123,7 @@ public class MainActivity extends AppCompatActivity
             startActivity(intent);
             overridePendingTransition(R.anim.anim_slide_in_from_right, R.anim.anim_hold);
         } else if (id == R.id.nav_login_ex) {
-            intent = new Intent(this, LoginExActivity.class);
+            intent = new Intent(this, FullscreenActivity.class);
             startActivity(intent);
             overridePendingTransition(R.anim.anim_slide_in_from_right, R.anim.anim_hold);
         } else if (id == R.id.nav_url) {
