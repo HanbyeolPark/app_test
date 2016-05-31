@@ -17,6 +17,8 @@ import org.json.JSONObject;
 public class Fragment1 extends Fragment {
 
     Adapter adapter;
+//    private static Fragment1 UniqueFragment1;
+//    private Fragment1(){ }
 
     @Nullable
     @Override
@@ -40,7 +42,7 @@ public class Fragment1 extends Fragment {
 
         Bundle bundle = getArguments();
         String[][] data = (String[][])bundle.getSerializable("parsedData");
-
+        Log.d("in_fragment_test_data", data[0][0]);
         adapter = new Adapter(getFragmentManager());
 
         for(int i=0; i< data.length; i++){
@@ -49,5 +51,11 @@ public class Fragment1 extends Fragment {
         viewPager.setAdapter(adapter);
 
     }
+
+//    public static synchronized Fragment1 getInstance(){
+//        if(UniqueFragment1 == null)
+//            UniqueFragment1 = new Fragment1();
+//        return UniqueFragment1;
+//    }
 
 }

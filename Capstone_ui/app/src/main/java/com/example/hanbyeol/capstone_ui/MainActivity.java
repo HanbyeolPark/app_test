@@ -62,6 +62,12 @@ public class MainActivity extends AppCompatActivity
     DrawerLayout drawer;
     TabLayout tabLayout_bottom;
     String[][] parsedData;
+    Fragment1 frag1;
+    Fragment2 frag2;
+    Fragment3 frag3;
+    Fragment4 frag4;
+    //String serverURL = "http://52.74.198.10/a.php";
+
     //List<NameValuePair> params = new ArrayList<NameValuePair>();
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
@@ -90,9 +96,6 @@ public class MainActivity extends AppCompatActivity
 
         tabLayout_bottom = (TabLayout) findViewById(R.id.main_tabs_bottom);
         TabLayoutBottomEvent();
-
-        //ReadBandmenu jsonBandmenu = new ReadBandmenu();
-       // jsonBandmenu.execute("http://52.74.198.10/a.php");
 
     }
 
@@ -131,7 +134,9 @@ public class MainActivity extends AppCompatActivity
             startActivity(intent);
             overridePendingTransition(R.anim.anim_slide_in_from_right, R.anim.anim_hold);
         } else if (id == R.id.nav_fragment_test) {
-
+            intent = new Intent(this, FragTestActivity.class);
+            startActivity(intent);
+            overridePendingTransition(R.anim.anim_slide_in_from_right, R.anim.anim_hold);
         }
 
         return true;
@@ -160,25 +165,39 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void setCurrentTabFragment(int tabPosition) {
+        //frag1 = frag1.getInstance();
+
+        if(frag1 == null)
+            frag1 = new Fragment1();
+        if(frag2 == null)
+            frag2 = new Fragment2();
+        if(frag3 == null)
+            frag3 = new Fragment3();
+        if(frag4 == null)
+            frag4 = new Fragment4();
 
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
-        Fragment1 frag1 = new Fragment1();
-        Fragment2 frag2 = new Fragment2();
-        Fragment3 frag3 = new Fragment3();
-        Fragment4 frag4 = new Fragment4();
 
         Bundle bundle = new Bundle();
-        JSONtabparser();
+        //JSONtabparser();
 
-        //ReadBandmenu jsonBandmenu = new ReadBandmenu();
-        //jsonBandmenu.execute("http://52.74.198.10/a.php");
+        ReadBandmenu jsonBandmenu = new ReadBandmenu();
+        jsonBandmenu.execute("http://52.74.198.10/a.php");
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         bundle.putSerializable("parsedData", parsedData);
-        frag1.setArguments(bundle);
+       // frag1.getInstance().setArguments(bundle);
+       // frag1.setArguments(bundle);
 
         switch (tabPosition) {
             case 0:
+                frag1.setArguments(bundle);
                 ft.replace(R.id.fragment_part_test, frag1);
                 ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
                 ft.commit();
@@ -204,17 +223,17 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public void JSONtabparser() {
-        String jsonString = "{\"app_ver\":\"0.1.1\",\"band_menu\":\n" +
-                "\t[\n" +
-                "\t\t{\"title\":\"Home\",\"url\":\"http:\\/\\/www.cconma.com\\/mobile\"},\n" +
-                "\t\t{\"title\":\"\\uaf43\\ub9c8USA\",\"url\":\"http:\\/\\/www.cconmausa.com\"},\n" +
-                "\t\t{\"title\":\"\\ucd94\\ucc9c\\uc0c1\\ud488\",\"url\":\"http:\\/\\/us05.cconmausa.com\\/mobile\\/test\\/1.html\"},\n" +
-                "\t\t{\"title\":\"\\uc601\\uc591\\ubc14\",\"url\":\"http:\\/\\/www.cconma.com\\/m\\/store\\/1\\/nutritionalbar\"},\n" +
-                "\t\t{\"title\":\"\\uc774\\ubca4\\ud2b8\",\"url\":\"http:\\/\\/www.cconma.com\\/mobile\\/product\\/index.pmv?pcode=P001011000-001023\"},\n" +
-                "\t\t{\"title\":\"\\ub124\\uc774\\ubc84\",\"url\":\"http:\\/\\/m.naver.com\"}\n" +
-                "\t]\n" +
-                "}";
+    public void JSONtabparser(String jsonString) {
+//        String jsonString = "{\"app_ver\":\"0.1.1\",\"band_menu\":\n" +
+//                "\t[\n" +
+//                "\t\t{\"title\":\"Home\",\"url\":\"http:\\/\\/www.cconma.com\\/mobile\"},\n" +
+//                "\t\t{\"title\":\"\\uaf43\\ub9c8USA\",\"url\":\"http:\\/\\/www.cconmausa.com\"},\n" +
+//                "\t\t{\"title\":\"\\ucd94\\ucc9c\\uc0c1\\ud488\",\"url\":\"http:\\/\\/us05.cconmausa.com\\/mobile\\/test\\/1.html\"},\n" +
+//                "\t\t{\"title\":\"\\uc601\\uc591\\ubc14\",\"url\":\"http:\\/\\/www.cconma.com\\/m\\/store\\/1\\/nutritionalbar\"},\n" +
+//                "\t\t{\"title\":\"\\uc774\\ubca4\\ud2b8\",\"url\":\"http:\\/\\/www.cconma.com\\/mobile\\/product\\/index.pmv?pcode=P001011000-001023\"},\n" +
+//                "\t\t{\"title\":\"\\ub124\\uc774\\ubc84\",\"url\":\"http:\\/\\/m.naver.com\"}\n" +
+//                "\t]\n" +
+//                "}";
 
         try {
             JSONObject jObjectString = new JSONObject(jsonString);
@@ -236,10 +255,7 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-/////////////////////////////////////
-
-
-    /*private class ReadBandmenu extends AsyncTask<String, String, String> {
+    private class ReadBandmenu extends AsyncTask<String, String, String> {
 
         protected void onPreExecute() {
         }
@@ -250,37 +266,46 @@ public class MainActivity extends AppCompatActivity
             StringBuilder responseStringBuilder = new StringBuilder();
             try {
                 URL url = new URL(urlString[0]);
-                trustAllHosts();
+                //trustAllHosts();
 
-                HttpsURLConnection httpsURLConnection = (HttpsURLConnection) url.openConnection();
-                httpsURLConnection.setHostnameVerifier(new HostnameVerifier() {
-                    @Override
-                    public boolean verify(String s, SSLSession sslSession) {
-                        return true;
-                    }
-                });
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                if (conn != null){
+                    conn.setConnectTimeout(10000);
+                    conn.setRequestMethod("POST");
+                    conn.setDoInput(true);
+                    conn.setDoOutput(true);
+                }
 
-                HttpURLConnection connection = httpsURLConnection;
+                Log.d("tag", "before making rescode !!!!");
+//                httpsURLConnection.setHostnameVerifier(new HostnameVerifier() {
+//                    @Override
+//                    public boolean verify(String s, SSLSession sslSession) {
+//                        return true;
+//                    }
+//                });
 
-                connection.setRequestMethod("POST");
-                connection.setDoInput(true);
-                connection.setDoOutput(true);
+//                HttpURLConnection connection = httpsURLConnection;
+//
+//                connection.setRequestMethod("POST");
+//                connection.setDoInput(true);
+//                connection.setDoOutput(true);
 
-                List<BasicNameValuePair> nameValuePairs = new ArrayList<BasicNameValuePair>(2);
-                nameValuePairs.add(new BasicNameValuePair("userId", "saltfactory"));
-                nameValuePairs.add(new BasicNameValuePair("password", "password"));
+//                List<BasicNameValuePair> nameValuePairs = new ArrayList<BasicNameValuePair>(2);
+//                nameValuePairs.add(new BasicNameValuePair("userId", "saltfactory"));
+//                nameValuePairs.add(new BasicNameValuePair("password", "password"));
 
-                OutputStream outputStream = connection.getOutputStream();
-                BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8"));
-                bufferedWriter.write(getURLQuery(nameValuePairs));
-                bufferedWriter.flush();
-                bufferedWriter.close();
-                outputStream.close();
+//                OutputStream outputStream = connection.getOutputStream();
+//                BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8"));
+//                bufferedWriter.write(getURLQuery(nameValuePairs));
+//                bufferedWriter.flush();
+//                bufferedWriter.close();
+//                outputStream.close();
 
-                connection.connect();
-
-                if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) { //200
-                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                //connection.connect();
+                int resCode = conn.getResponseCode();
+                if(resCode == HttpURLConnection.HTTP_OK){
+                    Log.d("tag", "resCode == HttpsURLConnection.HTTP_OK");
+                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
                     for ( ; ; ) {
                         String stringLine = bufferedReader.readLine();
                         if (stringLine == null) break;
@@ -289,36 +314,54 @@ public class MainActivity extends AppCompatActivity
                     bufferedReader.close();
                 }
 
-                connection.disconnect();
+                conn.disconnect();
 
-                Log.d("tag", responseStringBuilder.toString());
+//                if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) { //200
+//                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+//                    for ( ; ; ) {
+//                        String stringLine = bufferedReader.readLine();
+//                        if (stringLine == null) break;
+//                        responseStringBuilder.append(stringLine + '\n');
+//                    }
+//                    bufferedReader.close();
+//                }
+//
+//                connection.disconnect();
 
             } catch (Exception e) {
                 e.printStackTrace();
             }
+
+            Log.d("return value", responseStringBuilder.toString());
+            JSONtabparser(responseStringBuilder.toString());
             return responseStringBuilder.toString();
         }
 
         @Override
         protected void onPostExecute(String jsonString) {
-            try {
-                JSONObject jObjectString = new JSONObject(jsonString);
-                JSONArray jArray = new JSONArray(jObjectString.getString("band_menu"));
-
-                String[] jsonName = {"title", "url"};
-                parsedData = new String[jArray.length()][jsonName.length];
-
-                for (int i = 0; i < jArray.length(); i++) {
-                    for (int j = 0; j < jsonName.length; j++) {
-                        JSONObject jObject = jArray.getJSONObject(i);
-                        parsedData[i][j] = jObject.getString(jsonName[j]);
-                        Log.d("parsedData", parsedData[i][j]);
-                    }
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+//            Log.d("test","hiHI????");
+//
+//            Log.d("whyyyy", jsonString);
+//
+//            try {
+//                JSONObject jObjectString = new JSONObject(jsonString);
+//                JSONArray jArray = new JSONArray(jObjectString.getString("band_menu"));
+//
+//                String[] jsonName = {"title", "url"};
+//                parsedData = new String[jArray.length()][jsonName.length];
+//
+//                for (int i = 0; i < jArray.length(); i++) {
+//                    for (int j = 0; j < jsonName.length; j++) {
+//                        JSONObject jObject = jArray.getJSONObject(i);
+//                        parsedData[i][j] = jObject.getString(jsonName[j]);
+//                        Log.d("parsedData", parsedData[i][j]);
+//                    }
+//                }
+//            } catch (JSONException e) {
+//                e.printStackTrace();
+//            }
         }
+
     }
 
     private static void trustAllHosts() {
@@ -378,8 +421,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         return stringBuilder.toString();
-    }*/
-
+    }
 
 }
 
