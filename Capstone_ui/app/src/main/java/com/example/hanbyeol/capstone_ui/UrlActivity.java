@@ -2,6 +2,7 @@ package com.example.hanbyeol.capstone_ui;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -38,6 +39,17 @@ public class UrlActivity extends AppCompatActivity {
                 mWebView.loadUrl("javascript:setMessage('" + mEditText.getText() + "')");
             }
         });
+
+        /*Toolbar toolbar = (Toolbar) findViewById(R.id.webview_toolbar);
+        setSupportActionBar(toolbar);
+        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
+        toolbar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish(); //WebViewActivity.this.finish();
+                overridePendingTransition(R.anim.anim_hold, R.anim.anim_slide_out_to_right);
+            }
+        });*/
     }
 
     private class AndroidBridge {

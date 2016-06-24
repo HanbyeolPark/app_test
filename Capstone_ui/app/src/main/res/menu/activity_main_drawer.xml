@@ -6,17 +6,11 @@
             android:id="@+id/nav_home"
             android:title="Home" />
         <item
-            android:id="@+id/nav_webview"
-            android:title="WebView" />
-        <item
-            android:id="@+id/nav_login_ex"
-            android:title="Login Ex" />
-        <item
             android:id="@+id/nav_url"
             android:title="URL" />
         <item
             android:id="@+id/nav_fragment_test"
-            android:title="Fragment Test" />
+            android:title="NEW webView from Activity" />
     </group>
 
 

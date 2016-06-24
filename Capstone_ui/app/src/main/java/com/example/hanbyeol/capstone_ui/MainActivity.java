@@ -121,14 +121,6 @@ public class MainActivity extends AppCompatActivity
             //intent = new Intent(this, MainActivity.class);
             // startActivity(intent);
             drawer.closeDrawer(GravityCompat.START);
-        } else if (id == R.id.nav_webview) {
-            intent = new Intent(this, WebViewActivity.class);
-            startActivity(intent);
-            overridePendingTransition(R.anim.anim_slide_in_from_right, R.anim.anim_hold);
-        } else if (id == R.id.nav_login_ex) {
-            intent = new Intent(this, FullscreenActivity.class);
-            startActivity(intent);
-            overridePendingTransition(R.anim.anim_slide_in_from_right, R.anim.anim_hold);
         } else if (id == R.id.nav_url) {
             intent = new Intent(this, UrlActivity.class);
             startActivity(intent);
