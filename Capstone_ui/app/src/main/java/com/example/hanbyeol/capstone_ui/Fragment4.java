@@ -12,9 +12,6 @@ import android.support.v4.app.Fragment;
  */
 public class Fragment4 extends Fragment {
 
-//    private static Fragment4 UniqueFragment4;
-//    private Fragment4(){ }
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -22,9 +19,4 @@ public class Fragment4 extends Fragment {
         return view;
     }
 
-//    public static synchronized Fragment4 getInstance(){
-//        if(UniqueFragment4 == null)
-//            UniqueFragment4 = new Fragment4();
-//        return UniqueFragment4;
-//    }
 }

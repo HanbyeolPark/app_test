@@ -9,20 +9,11 @@ import android.view.ViewGroup;
 
 public class Fragment3 extends Fragment {
 
-//    private static Fragment3 UniqueFragment3;
-//    private Fragment3(){ }
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.content_fragment3, container, false);
         return view;
     }
-
-//    public static synchronized Fragment3 getInstance(){
-//        if(UniqueFragment3 == null)
-//            UniqueFragment3 = new Fragment3();
-//        return UniqueFragment3;
-//    }
 
 }

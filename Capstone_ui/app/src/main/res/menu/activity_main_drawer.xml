@@ -11,6 +11,12 @@
         <item
             android:id="@+id/nav_fragment_test"
             android:title="NEW webView from Activity" />
+        <item
+            android:id="@+id/nav_login_ex"
+            android:title="LoginEx" />
+        <item
+            android:id="@+id/nav_webview"
+            android:title="WebView" />
     </group>
 
 

@@ -1,75 +1,137 @@
 package com.example.hanbyeol.capstone_ui;
 
+import android.app.LauncherActivity;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.KeyEvent;
-import android.view.View;
-import android.webkit.JavascriptInterface;
-import android.webkit.WebView;
-import android.widget.Button;
-import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
-import android.os.Handler;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Vector;
 
 public class UrlActivity extends AppCompatActivity {
+    ImageView imView;
+    TextView txtView;
 
-    WebView mWebView;
-    TextView mTextView;
-    EditText mEditText;
-    Button mButton;
-
+    Bitmap bmImg;
+    //back task;
+    phpDown task;
+    ArrayList<LauncherActivity.ListItem> listItem= new ArrayList<LauncherActivity.ListItem>();
+    LauncherActivity.ListItem Item;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_url);
+        task = new phpDown();
+        txtView = (TextView)findViewById(R.id.url_textview);
 
-        mWebView = (WebView) findViewById(R.id.url_webView);
-        mTextView = (TextView) findViewById(R.id.url_textview);
-        mButton = (Button) findViewById(R.id.url_button);
-        mEditText = (EditText) findViewById(R.id.url_edittext);
+        //imView = (ImageView) findViewById(R.id.imageView1);
 
-        mWebView.getSettings().setJavaScriptEnabled(true);
-        mWebView.addJavascriptInterface(new AndroidBridge(), "androidBridge");
-        mWebView.loadUrl("file:///android_asset/index.html");
-
-        mButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                mWebView.loadUrl("javascript:setMessage('" + mEditText.getText() + "')");
-            }
-        });
-
-        /*Toolbar toolbar = (Toolbar) findViewById(R.id.webview_toolbar);
-        setSupportActionBar(toolbar);
-        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
-        toolbar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish(); //WebViewActivity.this.finish();
-                overridePendingTransition(R.anim.anim_hold, R.anim.anim_slide_out_to_right);
-            }
-        });*/
+        task.execute("http://52.74.198.10/d.php");
     }
 
-    private class AndroidBridge {
-        @JavascriptInterface
-        public void setMessage(final String arg) {
-            Handler handler = null;
-            handler.post(new Runnable() {
-                public void run() {
-                    Log.d("tag", "arg:" + arg);
-                    mTextView.setText("received msg : \n" + arg);
-                }
-            });
+    private class back extends AsyncTask<String, Integer,Bitmap> {
+        @Override
+        protected Bitmap doInBackground(String... urls) {
+            // TODO Auto-generated method stub
+            try{
+                URL myFileUrl = new URL(urls[0]);
+                HttpURLConnection conn = (HttpURLConnection)myFileUrl.openConnection();
+                conn.setDoInput(true);
+                conn.connect();
+                //String json = DownloadHtml("http://117.16.243.116/appdata.php");
+                InputStream is = conn.getInputStream();
+
+                bmImg = BitmapFactory.decodeStream(is);
+
+
+            }catch(IOException e){
+                e.printStackTrace();
+            }
+            return bmImg;
         }
+
+        protected void onPostExecute(Bitmap img){
+            imView.setImageBitmap(bmImg);
+        }
+
+    }
+    private class phpDown extends AsyncTask<String, Integer,String>{
+
+        @Override
+        protected String doInBackground(String... urls) {
+            StringBuilder jsonHtml = new StringBuilder();
+            try{
+                // 연결 url 설정
+                URL url = new URL(urls[0]);
+                // 커넥션 객체 생성
+                HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+                // 연결되었으면.
+                if(conn != null){
+                    conn.setConnectTimeout(10000);
+                    conn.setUseCaches(false);
+                    // 연결되었음 코드가 리턴되면.
+                    if(conn.getResponseCode() == HttpURLConnection.HTTP_OK){
+                        BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+                        for(;;){
+                            // 웹상에 보여지는 텍스트를 라인단위로 읽어 저장.
+                            String line = br.readLine();
+                            if(line == null) break;
+                            // 저장된 텍스트 라인을 jsonHtml에 붙여넣음
+                            jsonHtml.append(line + "\n");
+                        }
+                        br.close();
+                    }
+                    conn.disconnect();
+                }
+            } catch(Exception ex){
+                ex.printStackTrace();
+            }
+            return jsonHtml.toString();
+
+        }
+
+        protected void onPostExecute(String str){
+
+            String imgurl="";
+            String txt1="";
+            String txt2="";
+            Vector<String> vector = new Vector<String>(3);
+            Vector<String> vector2 = new Vector<String>(3);
+            try{
+
+                JSONObject root = new JSONObject(str);
+                JSONArray ja = root.getJSONArray("result");
+                for(int i=0; i<ja.length(); i++){
+                    JSONObject jo = ja.getJSONObject(i);
+                    imgurl = jo.getString("name");
+                    txt1 = jo.getString("address");
+                    vector.addElement(jo.getString("name"));
+                    vector2.addElement(jo.getString("address"));
+
+                }
+            }catch(JSONException e){
+                e.printStackTrace();
+            }
+            for(int i =0; i<vector.size();i++)
+                txt2=txt2+"name: "+vector.elementAt(i)+" address: "+vector2.elementAt(i)+"\n";
+
+            txtView.setText(txt2);
+        }
+
     }
 
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        UrlActivity.this.finish();
-        overridePendingTransition(R.anim.anim_hold, R.anim.anim_slide_out_to_right);
-
-        return false;
-    }
 }

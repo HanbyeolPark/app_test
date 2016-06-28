@@ -1,47 +1,101 @@
 package com.example.hanbyeol.capstone_ui;
 
-import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.app.ProgressDialog;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.KeyEvent;
+import android.os.Bundle;
 import android.view.View;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
+import android.widget.EditText;
+import android.widget.Toast;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLEncoder;
 
 public class WebViewActivity extends AppCompatActivity {
+
+    private EditText editTextName;
+    private EditText editTextAdd;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_web_view);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.webview_toolbar);
-        setSupportActionBar(toolbar);
-        toolbar.setNavigationIcon(R.drawable.ic_arrow_back_white_24dp);
-        toolbar.setOnClickListener(new View.OnClickListener() {
+        editTextName = (EditText) findViewById(R.id.name);
+        editTextAdd = (EditText) findViewById(R.id.address);
+
+    }
+
+    public void insert(View view){
+        String name = editTextName.getText().toString();
+        String address = editTextAdd.getText().toString();
+
+        insertToDatabase(name, address);
+    }
+
+    private void insertToDatabase(String name, String address){
+
+        class InsertData extends AsyncTask<String, Void, String> {
+            ProgressDialog loading;
+
             @Override
-            public void onClick(View v) {
-                finish(); //WebViewActivity.this.finish();
-                overridePendingTransition(R.anim.anim_hold, R.anim.anim_slide_out_to_right);
+            protected void onPreExecute() {
+                super.onPreExecute();
+                loading = ProgressDialog.show(WebViewActivity.this, "Please Wait", null, true, true);
             }
-        });
 
-        WebView mWebView = (WebView) findViewById(R.id.webview_webview);
-        mWebView.setWebViewClient(new WebViewClient());
-        mWebView.getSettings().setJavaScriptEnabled(true);
-        //mWebView.addJavascriptInterface(new AndroidBridge(), "androidBridge");
-        mWebView.loadUrl("http://www.naver.com");
+            @Override
+            protected void onPostExecute(String s) {
+                super.onPostExecute(s);
+                loading.dismiss();
+                Toast.makeText(getApplicationContext(), s, Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            protected String doInBackground(String... params) {
+
+                try{
+                    String name = (String)params[0];
+                    String address = (String)params[1];
+
+                    String link="http://52.74.198.10/c.php";
+                    String data  = URLEncoder.encode("name", "UTF-8") + "=" + URLEncoder.encode(name, "UTF-8");
+                    data += "&" + URLEncoder.encode("address", "UTF-8") + "=" + URLEncoder.encode(address, "UTF-8");
+
+                    URL url = new URL(link);
+                    URLConnection conn = url.openConnection();
+
+                    conn.setDoOutput(true);
+                    OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream());
+
+                    wr.write( data );
+                    wr.flush();
+
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+
+                    StringBuilder sb = new StringBuilder();
+                    String line = null;
+
+                    // Read Server Response
+                    while((line = reader.readLine()) != null)
+                    {
+                        sb.append(line);
+                        break;
+                    }
+                    return sb.toString();
+                }
+                catch(Exception e){
+                    return new String("Exception: " + e.getMessage());
+                }
+            }
+        }
+
+        InsertData task = new InsertData();
+        task.execute(name, address);
     }
-
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        WebViewActivity.this.finish();
-        overridePendingTransition(R.anim.anim_hold, R.anim.anim_slide_out_to_right);
-
-        return false;
-    }
-
 }

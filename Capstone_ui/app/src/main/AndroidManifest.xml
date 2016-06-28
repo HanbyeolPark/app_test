@@ -54,7 +54,10 @@
             android:name=".FragTestActivity"
             android:label="@string/title_activity_frag_test"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".WebViewFragment"></activity>
+        <activity android:name=".WebViewFragment" />
+        <activity android:name=".UrlActivity" />
+        <activity android:name=".WebViewActivity" />
+        <activity android:name=".LoginExActivity"></activity>
     </application>
 
 </manifest>

@@ -9,16 +9,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import java.util.Vector;
 
 public class Fragment1 extends Fragment {
 
     Adapter adapter;
-//    private static Fragment1 UniqueFragment1;
-//    private Fragment1(){ }
 
     @Nullable
     @Override
@@ -29,9 +24,12 @@ public class Fragment1 extends Fragment {
         if (viewPager != null) {
             setupViewPager(viewPager);
         }
+        //viewPager.setOffscreenPageLimit(6);
 
         TabLayout tabLayout = (TabLayout) view.findViewById(R.id.main_tabs);
         tabLayout.setupWithViewPager(viewPager);
+
+        Log.d("test", "in fragment1");
 
         return view;
     }
@@ -40,22 +38,22 @@ public class Fragment1 extends Fragment {
         //get information about tabs from server
         //make Fragments as number of categories
 
-        Bundle bundle = getArguments();
-        String[][] data = (String[][])bundle.getSerializable("parsedData");
-        Log.d("in_fragment_test_data", data[0][0]);
+        Vector<Fragment1_> vector = new Vector<Fragment1_>(5);
         adapter = new Adapter(getFragmentManager());
-
-        for(int i=0; i< data.length; i++){
-            adapter.addFragment(new Fragment1_(data[i][1]), data[i][0]);
+        Bundle extra = getArguments();
+        String[] url = extra.getStringArray("url");
+        String[] title = extra.getStringArray("title");
+        Log.d("test", "in fragment1, 1");
+        for(int i=0; i<url.length;i++){
+            Bundle bundle = new Bundle();
+            bundle.putString("url", url[i]);
+            vector.addElement(new Fragment1_());
+            vector.get(i).setArguments(bundle);
+            adapter.addFragment(vector.get(i), title[i]);
+            Log.d("test", "in fragment1, 2");
         }
         viewPager.setAdapter(adapter);
-
+        Log.d("test", "in fragment1, 3");
     }
-
-//    public static synchronized Fragment1 getInstance(){
-//        if(UniqueFragment1 == null)
-//            UniqueFragment1 = new Fragment1();
-//        return UniqueFragment1;
-//    }
 
 }
